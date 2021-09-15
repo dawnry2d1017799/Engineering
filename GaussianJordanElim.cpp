@@ -21,7 +21,7 @@ void printMatrix(float arr[][MATRIX_MAX_DIMEN], int equationLength) {
         for (int columnCounter = 0; columnCounter < equationLength + 1;
              columnCounter++) {
             if (columnCounter == equationLength) {
-                cout << "|  " << arr[rowCounter][columnCounter];
+                cout << "|\t" << arr[rowCounter][columnCounter];
             } else {
                 cout << arr[rowCounter][columnCounter];
             }
@@ -83,17 +83,21 @@ int solve() {
         cout << "Unable to solve, no possible solution found";
     }
 }
-
-char getNthVariable(int n)
-{
+/**
+ * This function use to get the arbitrary variable representation
+ *base on alphabet numerical order(e.g, xyz = 1234 where x = 1 and z = 3)
+ *@param n the numerical order of alphabet.
+ *@return return the character in the string (based on the index of the character in the string).
+ */
+char getNthVariable(int n) {
     assert(n >= 1 && n <= 26);
-    return "xyzdefghijklmnopqrstuvwabc"[n-1];
+    return "xyzdefghijklmnopqrstuvwabc"[n - 1];
 }
 
 void printResult() {
-    cout << "The result is: \n";
+    cout << "The result are: \n";
     for (int i = 0; i < numberOfEquation; i++) {
-        cout << getNthVariable(i+1) << ": " << result[i] << "\n";
+        cout << getNthVariable(i + 1) << ": " << result[i] << "\n";
     }
 }
 
@@ -136,9 +140,9 @@ void test() {
 }
 
 int main() {
-    // test();
-    askInput();
-    solve();
-    printResult();
+    test();
+    // askInput();
+    // solve();
+    // printResult();
     return 0;
 }
