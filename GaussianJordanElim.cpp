@@ -116,7 +116,7 @@ char getNthVariable(int n) {
 }
 
 void printResult() {
-    cout << "The result are: \n";
+    cout << " The result are: \n";
     for (int i = 0; i < numberOfEquation; i++) {
         cout << getNthVariable(i + 1) << ": " << result[i] << "\n";
     }
@@ -162,9 +162,9 @@ void test() {
 }
 
 int main() {
-    test();
-    // askInput();
-    // solve();
-    // printResult();
+    // test();
+    askInput();
+    solve();
+    printResult();
     return 0;
 }
