@@ -128,7 +128,7 @@ void askInput() {
     cin >> numberOfEquation;
 
     for (int rowCounter = 0; rowCounter < numberOfEquation; rowCounter++) {
-        cout << "--Enter the coeficients for the equation: " << rowCounter + 1
+        cout << "\n\n--Enter the coeficients for the equation: " << rowCounter + 1
              << "\n";
         for (int columnCounter = 0; columnCounter <= numberOfEquation;
              columnCounter++) {
