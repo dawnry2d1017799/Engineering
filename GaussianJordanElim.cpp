@@ -1,4 +1,3 @@
-// Gauss elimination for solving LPP
 #include <bits/stdc++.h>
 #include <conio.h>
 #include <math.h>
@@ -100,7 +99,7 @@ void printResult() {
 
 void askInput() {
     // Ask user the number of equation to add.
-    cout << "-Enter no of equation: \t";
+    cout << "-Enter the number of equations: \t";
     cin >> numberOfEquation;
 
     for (int rowCounter = 0; rowCounter < numberOfEquation; rowCounter++) {
@@ -118,6 +117,7 @@ void askInput() {
     printMatrix(matrix, numberOfEquation);
 }
 
+// This function is use for testing!
 void test() {
     const int testCaseMatrix[4][5] = {{2, 1, -1, 2, 5},
                                       {0, 3, -1, 2, -1},
@@ -136,9 +136,9 @@ void test() {
 }
 
 int main() {
-    test();
-    // askInput();
-    // solve();
-    // printResult()
+    // test();
+    askInput();
+    solve();
+    printResult();
     return 0;
 }
