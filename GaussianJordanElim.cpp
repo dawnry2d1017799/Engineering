@@ -1,3 +1,14 @@
+/**
+    Purpose: Finds the answer of system of equations with unknown variables
+   using Gauss-Jordan elimination with a N Number of Square Matrix.
+
+    Warning: Please Don't mindlessly copy my Work,
+    Read this first so that this will not be added to your code.
+
+    @author Dawnry Davocol
+    @version 1.0 9/16/2021
+*/
+
 #include <bits/stdc++.h>
 #include <conio.h>
 #include <math.h>
@@ -34,6 +45,8 @@ void printMatrix(float arr[][MATRIX_MAX_DIMEN], int equationLength) {
 
 int solve() {
     int flag = FLAG_POSSIBLE;
+    int stepToEchelon = 0;
+    int solvingStepCounter = 0;
 
     for (int i = 0; i < numberOfEquation; i++) {
         if (matrix[i][i] == 0) {
@@ -55,6 +68,13 @@ int solve() {
                 for (int k = 0; k <= numberOfEquation; k++)
                     matrix[j][k] = matrix[j][k] - (matrix[i][k]) * pro;
             }
+
+            // Utitlity for displaying the steps.
+            stepToEchelon++;
+            cout << "------Converting to Echelon form, Step Counter: "
+                 << stepToEchelon << "\n\n";
+            printMatrix(matrix, numberOfEquation);
+            cout << "\n\n";
         }
     }
 
@@ -87,7 +107,8 @@ int solve() {
  * This function use to get the arbitrary variable representation
  *base on alphabet numerical order(e.g, xyz = 1234 where x = 1 and z = 3)
  *@param n the numerical order of alphabet.
- *@return return the character in the string (based on the index of the character in the string).
+ *@return return the character in the string (based on the index of the
+ *character in the string).
  */
 char getNthVariable(int n) {
     assert(n >= 1 && n <= 26);
@@ -118,6 +139,7 @@ void askInput() {
         cout << "\n";
     }
 
+    cout << "This is your input matrix: \n";
     printMatrix(matrix, numberOfEquation);
 }
 
