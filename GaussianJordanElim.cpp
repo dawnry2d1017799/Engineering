@@ -36,7 +36,7 @@ void printMatrix(double matrix[][MATRIX_MAX_DIMEN + 1], int equationLength) {
             if (columnCounter == equationLength) {
                 printf(":\t%f\t|", matrix[rowCounter][columnCounter]);
             } else if (columnCounter == 0) {
-                printf("|\t%f\t", matrix[rowCounter][columnCounter]);
+                printf("\t|\t%f\t", matrix[rowCounter][columnCounter]);
             } else {
                 printf("%f\t", matrix[rowCounter][columnCounter]);
             }
@@ -157,7 +157,7 @@ void setCursorPos(int column, int line) {
 
 void constructMatrixForm() {
     for (int i = 1; i <= numberOfEquation; i++) {
-        cout << "|";
+        cout << "\t|";
         for (int j = 0; j <= numberOfEquation; j++) {
             cout << "\t";
         }
@@ -172,12 +172,12 @@ void askInputInCascadingForm() {
 
     // Primary Cursor position offset
     COORD cursorPos = getCurrentCursorPos(GetStdHandle(STD_OUTPUT_HANDLE));
-    int offsetX = 0;
+    int offsetX = 9;
     int offsetY = (cursorPos.Y - numberOfEquation) - 1;
 
     // SetConsoleCursorPosition();
     for (int r = 0; r < numberOfEquation; r++) {
-        setCursorPos(2, ++offsetY);
+        setCursorPos(offsetX, ++offsetY);
 
         for (int c = 0; c <= numberOfEquation; c++) {
             if (c == numberOfEquation) {
@@ -185,11 +185,8 @@ void askInputInCascadingForm() {
             }
 
             cin >> mMatrix[r][c];
-            cursorPos = getCurrentCursorPos(GetStdHandle(STD_OUTPUT_HANDLE));
 
-            // The offset is base on tab space which is 8.
-            offsetX = cursorPos.X + ((c + 1) * 8);
-            setCursorPos(offsetX, offsetY);
+            setCursorPos(offsetX + ((c + 1) * 8), offsetY);
         }
     }
     cout << "\n\n";
