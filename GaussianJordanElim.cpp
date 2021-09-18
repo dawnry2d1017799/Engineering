@@ -12,6 +12,7 @@
 #include <bits/stdc++.h>
 #include <conio.h>
 #include <math.h>
+#include <windows.h>
 
 #include <iostream>
 using namespace std;
@@ -103,6 +104,7 @@ int solve() {
         cout << "Unable to solve, no possible solution found";
     }
 }
+
 /**
  * This function use to get the arbitrary variable representation
  *base on alphabet numerical order(e.g, xyz = 1234 where x = 1 and z = 3)
@@ -128,8 +130,8 @@ void askInput() {
     cin >> numberOfEquation;
 
     for (int rowCounter = 0; rowCounter < numberOfEquation; rowCounter++) {
-        cout << "\n\n--Enter the coeficients for the equation: " << rowCounter + 1
-             << "\n";
+        cout << "\n\n--Enter the coeficients for the equation: "
+             << rowCounter + 1 << "\n";
         for (int columnCounter = 0; columnCounter <= numberOfEquation;
              columnCounter++) {
             cout << "\n--Coefficient: " << columnCounter + 1 << ": ";
@@ -143,12 +145,69 @@ void askInput() {
     printMatrix(matrix, numberOfEquation);
 }
 
+COORD getCurrentCursorPos(HANDLE hConsoleOutput) {
+    CONSOLE_SCREEN_BUFFER_INFO cbsi;
+
+    if (GetConsoleScreenBufferInfo(hConsoleOutput, &cbsi)) {
+        return cbsi.dwCursorPosition;
+    }
+
+    return {0, 0};
+}
+
+void setCursorPos(int column, int line) {
+    COORD coord;
+    coord.X = column;
+    coord.Y = line;
+
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorPosition(hConsole, coord);
+}
+
+void constructMatrixForm() {
+    for (int i = 1; i <= numberOfEquation; i++) {
+        cout << "|";
+        for (int j = 0; j <= numberOfEquation; j++) {
+            cout << "\t";
+        }
+        cout << "|\n";
+    }
+}
+
+void cascadingInput() {
+    cout << "-Enter the number of equations: \t";
+    cin >> numberOfEquation;
+    constructMatrixForm();
+
+    // Primary Cursor position offset
+    COORD cursorPos = getCurrentCursorPos(GetStdHandle(STD_OUTPUT_HANDLE));
+    int offsetX = 0;
+    int offsetY = (cursorPos.Y - numberOfEquation) - 1;
+
+    // SetConsoleCursorPosition();
+    for (int r = 0; r < numberOfEquation; r++) {
+        setCursorPos(2, ++offsetY);
+
+        for (int c = 0; c <= numberOfEquation; c++) {
+            if (c == numberOfEquation) {
+                cout << ": ";
+            }
+            scanf("%i", &matrix[r][c]);
+            cursorPos = getCurrentCursorPos(GetStdHandle(STD_OUTPUT_HANDLE));
+
+            // The offset is base on tab space which is 8.
+            offsetX = cursorPos.X + ((c + 1) * 8);
+            setCursorPos(offsetX, offsetY);
+        }
+    }
+}
+
 // This function is use for testing!
 void test() {
     const int testCaseMatrix[4][5] = {{2, 1, -1, 2, 5},
-                                      {0, 3, -1, 2, -1},
-                                      {0, 0, -1, 4, 11},
-                                      {0, 0, 0, 2, 6}};
+                                      {34, 3, -1, 2, -1},
+                                      {4, 3, -1, 4, 11},
+                                      {34, 2, 3, 2, 6}};
     numberOfEquation = 4;
     for (int i = 0; i < numberOfEquation; i++) {
         for (int j = 0; j < numberOfEquation + 1; j++) {
@@ -159,12 +218,15 @@ void test() {
     printMatrix(matrix, numberOfEquation);
     solve();
     printResult();
+    setCursorPos(0, 0);
 }
 
 int main() {
+    cascadingInput();
     // test();
-    askInput();
+    // constructMatrixForm();
+    // askInput();
     solve();
-    printResult();
+    // printResult();
     return 0;
 }
