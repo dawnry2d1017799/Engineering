@@ -22,87 +22,28 @@ const int FLAG_POSSIBLE = 1;
 const int FLAG_NO_SOLUTION = 2;
 const int FLAG_INFINITE_SOLUTION = 3;
 const int MATRIX_MAX_DIMEN = 10;
-
+int mPrintCounter = 0;
 int numberOfEquation;
-float matrix[MATRIX_MAX_DIMEN][MATRIX_MAX_DIMEN];
-float result[MATRIX_MAX_DIMEN] = {0};
+double mMatrix[MATRIX_MAX_DIMEN][MATRIX_MAX_DIMEN + 1];
 
 // Function display the matrix
-void printMatrix(float arr[][MATRIX_MAX_DIMEN], int equationLength) {
+void printMatrix(double matrix[][MATRIX_MAX_DIMEN + 1], int equationLength) {
+    printf("Solving step: %i\n\n", ++mPrintCounter);
+
     for (int rowCounter = 0; rowCounter < equationLength; rowCounter++) {
         for (int columnCounter = 0; columnCounter < equationLength + 1;
              columnCounter++) {
             if (columnCounter == equationLength) {
-                cout << "|\t" << arr[rowCounter][columnCounter];
+                printf(":\t%f\t|", matrix[rowCounter][columnCounter]);
+            } else if (columnCounter == 0) {
+                printf("|\t%f\t", matrix[rowCounter][columnCounter]);
             } else {
-                cout << arr[rowCounter][columnCounter];
+                printf("%f\t", matrix[rowCounter][columnCounter]);
             }
-            cout << "\t";
         }
         cout << "\n";
     }
     cout << "\n";
-}
-
-int solve() {
-    int flag = FLAG_POSSIBLE;
-    int stepToEchelon = 0;
-    int solvingStepCounter = 0;
-
-    for (int i = 0; i < numberOfEquation; i++) {
-        if (matrix[i][i] == 0) {
-            int temp = 1;
-            while ((i + temp) < numberOfEquation && matrix[i + temp][i] == 0)
-                temp++;
-            if ((i + temp) == numberOfEquation) {
-                flag = FLAG_WEIRD;
-                break;
-            }
-            for (int j = i, k = 0; k <= numberOfEquation; k++)
-                swap(matrix[j][k], matrix[j + temp][k]);
-        }
-
-        // To echelon form
-        for (int j = 0; j < numberOfEquation; j++) {
-            if (i != j) {
-                float pro = matrix[j][i] / matrix[i][i];
-                for (int k = 0; k <= numberOfEquation; k++)
-                    matrix[j][k] = matrix[j][k] - (matrix[i][k]) * pro;
-            }
-
-            // Utitlity for displaying the steps.
-            stepToEchelon++;
-            cout << "------Converting to Echelon form, Step Counter: "
-                 << stepToEchelon << "\n\n";
-            printMatrix(matrix, numberOfEquation);
-            cout << "\n\n";
-        }
-    }
-
-    if (flag == FLAG_POSSIBLE) {
-        for (int i = 0; i < numberOfEquation; i++) {
-            result[i] = matrix[i][numberOfEquation] / matrix[i][i];
-        }
-    } else if (flag == FLAG_WEIRD) {
-        // Check accuracy of the result.
-        int consistencyFlag = FLAG_NO_SOLUTION;
-        for (int i = 0; i < numberOfEquation; i++) {
-            int sum = 0;
-            for (int j = 0; j < numberOfEquation; j++) {
-                sum = sum + matrix[i][j];
-                if (sum == matrix[i][j])
-                    consistencyFlag = FLAG_INFINITE_SOLUTION;
-            }
-        }
-
-        if (consistencyFlag == FLAG_INFINITE_SOLUTION) {
-            cout << "Has infinite solution!";
-        } else {
-            cout << "No solution!";
-        }
-    } else {
-        cout << "Unable to solve, no possible solution found";
-    }
 }
 
 /**
@@ -117,32 +58,82 @@ char getNthVariable(int n) {
     return "xyzdefghijklmnopqrstuvwabc"[n - 1];
 }
 
-void printResult() {
-    cout << " The result are: \n";
-    for (int i = 0; i < numberOfEquation; i++) {
-        cout << getNthVariable(i + 1) << ": " << result[i] << "\n";
+void swap_row(double matrix[][MATRIX_MAX_DIMEN + 1], int i, int j) {
+    for (int k = 0; k <= numberOfEquation; k++) {
+        double temp = matrix[i][k];
+        matrix[i][k] = matrix[j][k];
+        matrix[j][k] = temp;
     }
 }
 
-void askInput() {
-    // Ask user the number of equation to add.
-    cout << "-Enter the number of equations: \t";
-    cin >> numberOfEquation;
+int forwardElim(double matrix[][MATRIX_MAX_DIMEN + 1]) {
+    for (int k = 0; k < numberOfEquation; k++) {
+        int maxValIndex = k;
+        int maxValue = matrix[maxValIndex][k];
 
-    for (int rowCounter = 0; rowCounter < numberOfEquation; rowCounter++) {
-        cout << "\n\n--Enter the coeficients for the equation: "
-             << rowCounter + 1 << "\n";
-        for (int columnCounter = 0; columnCounter <= numberOfEquation;
-             columnCounter++) {
-            cout << "\n--Coefficient: " << columnCounter + 1 << ": ";
-            cin >> matrix[rowCounter][columnCounter];
+        for (int i = k + 1; i < numberOfEquation; i++) {
+            if (abs(matrix[i][k]) > maxValue)
+                maxValue = matrix[i][k], maxValIndex = i;
+            printMatrix(mMatrix, numberOfEquation);
         }
 
-        cout << "\n";
+        if (!matrix[k][maxValIndex]) return k;
+
+        if (maxValIndex != k) swap_row(matrix, k, maxValIndex);
+
+        for (int i = k + 1; i < numberOfEquation; i++) {
+            double f = matrix[i][k] / matrix[k][k];
+
+            for (int j = k + 1; j <= numberOfEquation; j++) {
+                matrix[i][j] -= matrix[k][j] * f;
+                printMatrix(mMatrix, numberOfEquation);
+            }
+
+            matrix[i][k] = 0;
+        }
+    }
+    return -1;
+}
+
+void backSubsitution(double matrix[][MATRIX_MAX_DIMEN + 1]) {
+    double result[numberOfEquation];  // An array to store solution
+
+    for (int i = numberOfEquation - 1; i >= 0; i--) {
+        result[i] = matrix[i][numberOfEquation];
+        for (int j = i + 1; j < numberOfEquation; j++) {
+            result[i] -= matrix[i][j] * result[j];
+        }
+        printMatrix(mMatrix, numberOfEquation);
+        result[i] = result[i] / matrix[i][i];
     }
 
-    cout << "This is your input matrix: \n";
-    printMatrix(matrix, numberOfEquation);
+    printf("\nSolution:\n");
+    for (int i = 0; i < numberOfEquation; i++)
+        printf("%c: %f\n", getNthVariable(i + 1), result[i]);
+}
+void gaussianElimination(double matrix[][MATRIX_MAX_DIMEN + 1]) {
+    int singular_flag = forwardElim(matrix);
+
+    if (singular_flag != -1) {
+        printf("Singular Matrix.\n");
+
+        if (matrix[singular_flag][numberOfEquation])
+            printf("Inconsistent System.");
+        else
+            printf("Has Infinite Solution.");
+
+        return;
+    }
+
+    backSubsitution(matrix);
+}
+
+void print(double matrix[][MATRIX_MAX_DIMEN + 1]) {
+    for (int i = 0; i < numberOfEquation; i++, printf("\n"))
+        for (int j = 0; j <= numberOfEquation; j++)
+            printf("%lf ", matrix[i][j]);
+
+    printf("\n");
 }
 
 COORD getCurrentCursorPos(HANDLE hConsoleOutput) {
@@ -174,8 +165,8 @@ void constructMatrixForm() {
     }
 }
 
-void cascadingInput() {
-    cout << "-Enter the number of equations: \t";
+void askInputInCascadingForm() {
+    cout << "\nEnter the number of equations: ";
     cin >> numberOfEquation;
     constructMatrixForm();
 
@@ -192,7 +183,8 @@ void cascadingInput() {
             if (c == numberOfEquation) {
                 cout << ": ";
             }
-            scanf("%i", &matrix[r][c]);
+
+            cin >> mMatrix[r][c];
             cursorPos = getCurrentCursorPos(GetStdHandle(STD_OUTPUT_HANDLE));
 
             // The offset is base on tab space which is 8.
@@ -200,33 +192,26 @@ void cascadingInput() {
             setCursorPos(offsetX, offsetY);
         }
     }
+    cout << "\n\n";
+    gaussianElimination(mMatrix);
 }
 
 // This function is use for testing!
 void test() {
-    const int testCaseMatrix[4][5] = {{2, 1, -1, 2, 5},
-                                      {34, 3, -1, 2, -1},
-                                      {4, 3, -1, 4, 11},
-                                      {34, 2, 3, 2, 6}};
-    numberOfEquation = 4;
+    const double testCaseMatrix[3][4] = {
+        {3.0, 2.0, -4.0, 3.0}, {2.0, 3.0, 3.0, 15.0}, {5.0, -3, 1.0, 14.0}};
+
+    numberOfEquation = 3;
     for (int i = 0; i < numberOfEquation; i++) {
         for (int j = 0; j < numberOfEquation + 1; j++) {
-            matrix[i][j] = testCaseMatrix[i][j];
+            mMatrix[i][j] = testCaseMatrix[i][j];
         }
     }
 
-    printMatrix(matrix, numberOfEquation);
-    solve();
-    printResult();
-    setCursorPos(0, 0);
+    gaussianElimination(mMatrix);
 }
 
 int main() {
-    cascadingInput();
-    // test();
-    // constructMatrixForm();
-    // askInput();
-    solve();
-    // printResult();
+    askInputInCascadingForm();
     return 0;
 }
