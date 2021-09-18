@@ -213,5 +213,6 @@ void test() {
 
 int main() {
     askInputInCascadingForm();
+    getch();
     return 0;
 }
